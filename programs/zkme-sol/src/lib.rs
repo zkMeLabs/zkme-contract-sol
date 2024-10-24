@@ -17,7 +17,9 @@ mod prelude {
 use prelude::*;
 use std::ops::Not;
 
-declare_id!("iK51qVs6Q1XMfDRJbSExmnVSeLtcacCCLeHStAnWuyq");
+
+declare_id!("");
+
 
 #[program]
 pub mod zkme_sol {
@@ -25,6 +27,7 @@ pub mod zkme_sol {
 
     pub fn create_admin(ctx: Context<CreateAdmin>) -> Result<()> {
         let admin = &mut ctx.accounts.admin;
+        admin.owner = *ctx.accounts.authority.key;
 
         admin
             .add_operator(ctx.accounts.authority.key())
@@ -85,16 +88,43 @@ pub mod zkme_sol {
     }
 
     pub fn mint_sbt(ctx: Context<MintSBT>) -> Result<()> {
-        let admin = &mut ctx.accounts.admin;
-        admin.next_counter += 1;
 
-        ctx.accounts.invoke_signed_init_untransferable_mint()?;
-        ctx.accounts.invoke_signed_init_mint2()?;
+        msg!("start mint sbt");
 
-        ctx.accounts.invoke_signed_init_immutable_owner()?;
-        token_2022::initialize_account3(ctx.accounts.as_init_account3_context())?;
+        let admin_seeds = &[
+            Admin::SEEDS.as_bytes(),
+            &ctx.accounts.admin.owner.as_ref(),
+        ];
+        let (admin_pda, bump_seed) = Pubkey::try_find_program_address(&admin_seeds[..], &crate::ID)
+            .ok_or(ZkmeError::InvalidAdminSeeds)?;
 
-        token_2022::mint_to(ctx.accounts.as_mint_to_context(), 1)?;
+        require!(
+            admin_pda == ctx.accounts.admin.key(),
+            ZkmeError::InvalidAdminAccount
+        );
+
+        let signers_seeds = &[
+            Admin::SEEDS.as_bytes(),
+            &ctx.accounts.admin.owner.as_ref(),
+            &[bump_seed],
+        ];
+
+        let binding = [&signers_seeds[..]];
+
+
+
+        let cpi_context = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            token_2022:: MintTo{
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.authority.to_account_info(),
+            },
+            &binding,
+        );
+
+        token_2022::mint_to(cpi_context, 1)?;
+
 
         Ok(())
     }

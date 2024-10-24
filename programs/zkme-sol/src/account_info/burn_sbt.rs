@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::token_2022::Token2022;
 
 #[derive(Accounts)]
 pub struct BurnSbt<'info> {
@@ -21,6 +22,7 @@ impl<'info> BurnSbt<'info> {
             from: self.token_account.to_account_info(),
             authority: self.authority.to_account_info(),
         };
+
 
         token_2022::burn(
             CpiContext::new(cpi_program, cpi_accounts).with_signer(&[]),

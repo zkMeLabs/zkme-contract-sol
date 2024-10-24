@@ -1,34 +1,37 @@
 use crate::prelude::*;
 
-#[derive(Debug, Copy, Clone)]
-pub struct Question([u8; 60]);
-
-impl AnchorSerialize for Question {
-    #[inline]
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        if let Some(u8_slice) = u8::u8_slice(&self.0) {
-            writer.write_all(u8_slice)?;
-        } else {
-            for el in self.0.iter() {
-                el.serialize(writer)?;
-            }
-        }
-        Ok(())
-    }
+#[derive(Debug, Copy, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct Question {
+    pub data: [u8; 60],
 }
+// pub struct Question([u8; 60]);
 
-impl AnchorDeserialize for Question {
-    #[inline]
-    fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let mut result = [u8::default(); 60];
-        if !u8::copy_from_bytes(buf, &mut result)? {
-            for item in result.iter_mut() {
-                *item = u8::deserialize(buf)?;
-            }
-        }
-        Ok(Question(result))
-    }
-}
+// impl AnchorSerialize for Question {
+//     #[inline]
+//     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+//         if let Some(u8_slice) = u8::u8_slice(&self.0) {
+//             writer.write_all(u8_slice)?;
+//         } else {
+//             for el in self.0.iter() {
+//                 el.serialize(writer)?;
+//             }
+//         }
+//         Ok(())
+//     }
+// }
+//
+// impl AnchorDeserialize for Question {
+//     #[inline]
+//     fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+//         let mut result = [u8::default(); 60];
+//         if !u8::copy_from_bytes(buf, &mut result)? {
+//             for item in result.iter_mut() {
+//                 *item = u8::deserialize(buf)?;
+//             }
+//         }
+//         Ok(Question(result))
+//     }
+// }
 
 #[non_exhaustive]
 #[repr(u8)]
