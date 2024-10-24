@@ -5,7 +5,7 @@ skip-lint = false
 #zkme_sol =
 
 [programs.mainnet]
-zkme_sol = ""
+zkme_sol = "6tVnLV3qrA7HddTzRGmeZs1cy5rAcTFs9sQiaoLbENAM"
 
 [registry]
 #url = "https://api.apr.dev"

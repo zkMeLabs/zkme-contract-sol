@@ -5,6 +5,5 @@ target
 **/*.rs.bk
 node_modules
 test-ledger
-Cargo.toml
 tests/onlineTest.ts
 tests/zkme-conf.ts

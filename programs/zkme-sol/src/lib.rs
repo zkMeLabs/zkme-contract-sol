@@ -18,7 +18,7 @@ use prelude::*;
 use std::ops::Not;
 
 
-declare_id!("");
+declare_id!("6tVnLV3qrA7HddTzRGmeZs1cy5rAcTFs9sQiaoLbENAM");
 
 
 #[program]
